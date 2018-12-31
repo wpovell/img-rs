@@ -1,3 +1,5 @@
+//! Module for various errors used when parsing PNGs
+
 use std::error;
 use std::fmt;
 
@@ -11,6 +13,7 @@ pub enum PngError {
 }
 
 impl PngError {
+    /// Return message used for Display & Error traits
     fn msg(&self) -> &str {
         match *self {
             PngError::BadChecksum  => "Bad checksum",

@@ -1,3 +1,5 @@
+//! Module for IHDR PNG Chunk
+
 use std::io::Cursor;
 use std::error;
 
@@ -18,12 +20,13 @@ pub struct IHDR {
 }
 
 impl Chunk for IHDR {
-    /// Return name of
+    /// Return name of Chunk
     fn name(&self) -> &'static str {
         "IHDR"
     }
 }
 
+/// Color-type options as defined by PNG Spec
 pub enum ColorType {
     Greyscale,
     TrueColor,
@@ -32,12 +35,14 @@ pub enum ColorType {
     TrueColorAlpha,
 }
 
+/// Interlace methods as defined by PNG Spec
 pub enum InterlaceMethod {
     Standard,
     Adam7,
 }
 
 impl ColorType {
+    /// Return whether the given bit-depth is valid for the color-type.
     fn allowed(&self, depth: u8) -> bool {
         let mask = match *self {
             ColorType::Greyscale      => 1 | 2 | 4 | 8 | 16,
@@ -50,11 +55,13 @@ impl ColorType {
     }
 }
 
+/// Parse data into an IHDR chunk
 pub fn parse(data: &[u8]) -> Result<IHDR> {
     let mut rdr = Cursor::new(data);
 
     let width = rdr.read_u32::<BigEndian>()?;
     let height = rdr.read_u32::<BigEndian>()?;
+    // Zero dimensions are invalid
     if width == 0 || height == 0 {
         return Err(PngError::BadChunk.into());
     }
@@ -74,11 +81,13 @@ pub fn parse(data: &[u8]) -> Result<IHDR> {
         return Err(PngError::BadChunk.into());
     }
 
+    // Only method 0 is valid
     let compression_method = rdr.read_u8()?;
     if compression_method != 0 {
         return Err(PngError::BadChunk.into());
     }
 
+    // Only method 0 is valid
     let filter_method = rdr.read_u8()?;
     if filter_method != 0 {
         return Err(PngError::BadChunk.into());

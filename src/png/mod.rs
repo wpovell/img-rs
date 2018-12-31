@@ -43,11 +43,13 @@ pub fn parse(buf: &mut Read) -> Result<Png> {
         let mut data = vec![0; (size + 4) as usize];
         buf.read_exact(&mut data)?;
 
+        // Checksum
         let checksum = buf.read_u32::<BigEndian>()?;
         if chunk_crc.checksum(&data) != checksum {
             return Err(PngError::BadChecksum.into());
         }
 
+        // Parse chunk
         if let Ok(png_chunk) = chunk::parse(&data) {
             println!("{}", png_chunk.name());
             png.chunks.push(png_chunk);
