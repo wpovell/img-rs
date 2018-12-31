@@ -1,0 +1,8 @@
+[package]
+name = "img"
+version = "0.1.0"
+authors = ["Will Povell <william_povell@brown.edu>"]
+edition = "2018"
+
+[dependencies]
+byteorder = "*"
